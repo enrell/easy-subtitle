@@ -56,6 +56,12 @@ module EasySubtitle
         status: status,
         alass_output: shell_result.stdout,
       )
+    rescue ex : Exception
+      SyncResult.new(
+        candidate_path: candidate,
+        status: SyncStatus::Failed,
+        alass_output: ex.message || "Synchronization failed",
+      )
     end
 
     private def classify_offset(offset : Float64) : SyncStatus

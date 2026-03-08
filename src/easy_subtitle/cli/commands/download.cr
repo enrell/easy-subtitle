@@ -35,30 +35,33 @@ module EasySubtitle
 
         total_downloaded = 0
         videos.each do |video|
-          if @config.use_movie_hash
-            video.compute_hash!
-          end
-
-          languages.each do |lang|
-            candidates = search.search(video, lang, series_mode)
-            if candidates.empty?
-              @log.warn "No subtitles found for #{video.name} [#{lang}]"
-              next
+          begin
+            if @config.use_movie_hash
+              video.compute_hash!
             end
 
-            # Download top N candidates
-            count = 0
-            candidates.first(@config.top_downloads).each do |candidate|
-              output_dir = video.directory
-              output_name = "#{video.stem}.#{lang}.#{candidate.file_id}.srt"
-              output_path = output_dir / output_name
-
-              if downloader.download(candidate, output_path)
-                @log.success "Downloaded: #{output_name}"
-                count += 1
+            languages.each do |lang|
+              candidates = search.search(video, lang, series_mode)
+              if candidates.empty?
+                @log.warn "No subtitles found for #{video.name} [#{lang}]"
+                next
               end
+
+              count = 0
+              candidates.first(@config.top_downloads).each do |candidate|
+                output_dir = video.directory
+                output_name = "#{video.stem}.#{lang}.#{candidate.file_id}.srt"
+                output_path = output_dir / output_name
+
+                if downloader.download(candidate, output_path)
+                  @log.success "Downloaded: #{output_name}"
+                  count += 1
+                end
+              end
+              total_downloaded += count
             end
-            total_downloaded += count
+          rescue ex : Exception
+            @log.error "Failed to process #{video.name}: #{ex.message}"
           end
         end
 

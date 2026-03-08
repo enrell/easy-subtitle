@@ -32,9 +32,13 @@ module EasySubtitle
 
         total_extracted = 0
         videos.each do |video|
-          extracted = extractor.extract(video)
-          total_extracted += extracted.size
-          remuxer.try(&.remux(video)) if remux
+          begin
+            extracted = extractor.extract(video)
+            total_extracted += extracted.size
+            remuxer.try(&.remux(video)) if remux
+          rescue ex : Exception
+            @log.error "Failed to process #{video.name}: #{ex.message}"
+          end
         end
 
         @log.success "Extracted #{total_extracted} subtitle track(s) from #{videos.size} video(s)"

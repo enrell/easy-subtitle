@@ -46,6 +46,12 @@ module EasySubtitle
       rescue ex : Error
         STDERR.puts "Error: #{ex.message}"
         exit 1
+      rescue ex : OptionParser::Exception
+        STDERR.puts "Argument error: #{ex.message}"
+        exit 1
+      rescue ex : Exception
+        STDERR.puts "Unexpected error: #{ex.message}"
+        exit 1
       end
 
       private def parse_global_options(args : Array(String)) : String?

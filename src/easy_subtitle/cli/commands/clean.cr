@@ -27,10 +27,14 @@ module EasySubtitle
 
         total_removed = 0
         srt_files.each do |srt_path|
-          removed = SrtCleaner.clean_file(srt_path, backup: !no_backup)
-          if removed > 0
-            @log.success "Cleaned #{srt_path.basename}: removed #{removed} ad block(s)"
-            total_removed += removed
+          begin
+            removed = SrtCleaner.clean_file(srt_path, backup: !no_backup)
+            if removed > 0
+              @log.success "Cleaned #{srt_path.basename}: removed #{removed} ad block(s)"
+              total_removed += removed
+            end
+          rescue ex : Exception
+            @log.error "Failed to clean #{srt_path.basename}: #{ex.message}"
           end
         end
 

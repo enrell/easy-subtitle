@@ -40,6 +40,29 @@ sudo mv easy-subtitle /usr/local/bin/
 
 Requires [Crystal](https://crystal-lang.org/install/) >= 1.15.0:
 
+On Linux, install the native development packages first.
+
+Ubuntu / Debian:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y zlib1g-dev libyaml-dev libssl-dev libpcre2-dev
+```
+
+Arch Linux:
+
+```bash
+sudo pacman -S --needed zlib libyaml openssl pcre2
+```
+
+That is enough for a normal Linux build on Arch.
+
+If you want a fully static Linux binary, you also need static archives for those libraries.
+
+Ubuntu / Debian runners used in GitHub Actions provide those through the `-dev` packages above, so the release workflow can build with `--static`.
+
+Arch is different. On a typical Arch install, `pcre2` ships `.a` files, but `zlib`, `libyaml`, and `openssl` often do not. That means `crystal build --static` can still fail even when the packages above are already installed. On Arch, use a normal non-static local build unless you are prepared to provide those missing static libraries yourself.
+
 ```bash
 git clone https://github.com/akitaonrails/easy-subtitle.git
 cd easy-subtitle

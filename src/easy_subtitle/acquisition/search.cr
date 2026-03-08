@@ -100,6 +100,12 @@ module EasySubtitle
       end
 
       results
+    rescue ex : ApiError
+      @log.error "Search failed: #{ex.message}"
+      [] of SubtitleCandidate
+    rescue ex : JSON::ParseException
+      @log.error "Search returned invalid JSON: #{ex.message}"
+      [] of SubtitleCandidate
     end
   end
 end

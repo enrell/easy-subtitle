@@ -15,6 +15,8 @@ module EasySubtitle
       uri = build_uri(path, params)
       headers = authenticated_headers
       HTTP::Client.get(uri, headers: headers)
+    rescue ex : IO::Error | Socket::Error
+      raise ApiError.new(-1, "GET #{path} failed: #{ex.message}")
     end
 
     def post(path : String, body : String? = nil) : HTTP::Client::Response
@@ -23,6 +25,8 @@ module EasySubtitle
       headers = authenticated_headers
       headers["Content-Type"] = "application/json"
       HTTP::Client.post(uri, headers: headers, body: body)
+    rescue ex : IO::Error | Socket::Error
+      raise ApiError.new(-1, "POST #{path} failed: #{ex.message}")
     end
 
     def authenticated_headers : HTTP::Headers

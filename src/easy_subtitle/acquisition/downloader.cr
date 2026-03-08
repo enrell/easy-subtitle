@@ -28,7 +28,12 @@ module EasySubtitle
         case response.status_code
         when 200
           json = JSON.parse(response.body)
-          return json["link"]?.try(&.as_s?)
+          link = json["link"]?.try(&.as_s?)
+          unless link
+            @log.error "Download response missing link for file #{file_id}"
+            return nil
+          end
+          return link
         when 503
           wait = (attempt + 1) * 2
           @log.warn "503 Service Unavailable, retrying in #{wait}s (#{attempt + 1}/#{retries})"
@@ -40,6 +45,12 @@ module EasySubtitle
       end
 
       @log.error "Download failed after #{retries} retries"
+      nil
+    rescue ex : ApiError
+      @log.error "Download request error: #{ex.message}"
+      nil
+    rescue ex : JSON::ParseException
+      @log.error "Download response was invalid JSON: #{ex.message}"
       nil
     end
 

@@ -34,6 +34,17 @@ describe EasySubtitle::Config do
       config.accept_offset_threshold.should eq 0.101
       config.smart_sync.should be_true
     end
+
+    it "wraps invalid yaml in ConfigError" do
+      path = "/tmp/easy-subtitle-invalid-config.yml"
+      File.write(path, "api_key: [broken")
+
+      expect_raises(EasySubtitle::ConfigError, /Invalid YAML/) do
+        EasySubtitle::Config.load(path)
+      end
+    ensure
+      File.delete(path) if path && File.exists?(path)
+    end
   end
 
   describe "#validate!" do

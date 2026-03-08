@@ -44,6 +44,8 @@ module EasySubtitle
       end
 
       {subtitle_tracks: subtitle_tracks, audio_tracks: audio_tracks}
+    rescue ex : JSON::ParseException
+      raise Error.new("Invalid mkvmerge JSON output: #{ex.message}")
     end
 
     def self.identify(video_path : String) : {subtitle_tracks: Array(SubtitleTrack), audio_tracks: Array(AudioTrack)}

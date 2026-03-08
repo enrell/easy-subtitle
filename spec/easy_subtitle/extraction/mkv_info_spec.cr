@@ -35,6 +35,12 @@ describe EasySubtitle::MkvInfo do
       audio[0].language.should eq "eng"
       audio[1].language.should eq "jpn"
     end
+
+    it "wraps invalid mkvmerge json" do
+      expect_raises(EasySubtitle::Error, /Invalid mkvmerge JSON output/) do
+        EasySubtitle::MkvInfo.parse("{not json")
+      end
+    end
   end
 
   describe "SubtitleTrack" do

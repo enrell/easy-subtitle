@@ -70,5 +70,13 @@ describe EasySubtitle::VideoScanner do
     ensure
       FileUtils.rm_rf("/tmp/easy-subtitle-test-skip")
     end
+
+    it "raises a project error for missing paths" do
+      config = EasySubtitle::Config.default
+
+      expect_raises(EasySubtitle::Error, /Path not found/) do
+        EasySubtitle::VideoScanner.scan("/tmp/easy-subtitle-does-not-exist", config)
+      end
+    end
   end
 end

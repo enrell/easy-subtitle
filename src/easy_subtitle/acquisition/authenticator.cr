@@ -38,11 +38,15 @@ module EasySubtitle
       end
 
       json = JSON.parse(response.body)
-      jwt = json["token"].as_s
+      jwt = json["token"]?.try(&.as_s?) || raise ApiError.new(200, "Login response missing token")
 
       save_token(jwt)
       @token = jwt
       jwt
+    rescue ex : JSON::ParseException
+      raise ApiError.new(200, "Invalid login response: #{ex.message}")
+    rescue ex : IO::Error | Socket::Error
+      raise ApiError.new(-1, "Login request failed: #{ex.message}")
     end
 
     def load_cached_token : String?

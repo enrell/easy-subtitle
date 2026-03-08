@@ -10,7 +10,15 @@ module EasySubtitle
 
       candidates.each do |candidate|
         spawn do
-          result = sync_one(candidate, video)
+          result = begin
+            sync_one(candidate, video)
+          rescue ex : Exception
+            SyncResult.new(
+              candidate_path: candidate,
+              status: SyncStatus::Failed,
+              alass_output: ex.message || "Synchronization failed",
+            )
+          end
           channel.send(result)
         end
       end
@@ -57,6 +65,12 @@ module EasySubtitle
         offset: offset,
         status: status,
         alass_output: shell_result.stdout,
+      )
+    rescue ex : Exception
+      SyncResult.new(
+        candidate_path: candidate,
+        status: SyncStatus::Failed,
+        alass_output: ex.message || "Synchronization failed",
       )
     end
 

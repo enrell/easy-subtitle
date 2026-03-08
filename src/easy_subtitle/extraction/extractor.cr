@@ -20,6 +20,10 @@ module EasySubtitle
       end
 
       extracted = [] of Path
+      language_counts = subtitle_tracks.each_with_object(Hash(String, Int32).new(0)) do |track, counts|
+        next unless track.extractable?
+        counts[track.language_2] += 1
+      end
 
       subtitle_tracks.each do |track|
         next unless track.extractable?
@@ -38,7 +42,7 @@ module EasySubtitle
         end
 
         ext = track.ass? ? ".ass" : ".srt"
-        output_name = "#{video.stem}.#{lang2}#{ext}"
+        output_name = build_output_name(video, lang2, track.id, ext, language_counts[lang2] > 1)
         output_path = video.directory / output_name
 
         if File.exists?(output_path) && !@config.resync_mode
@@ -53,12 +57,23 @@ module EasySubtitle
           end
           @log.success "Extracted: #{output_name}"
           extracted << output_path
-        rescue ex : ExternalToolError
+        rescue ex : Exception
           @log.error "Failed to extract track #{track.id}: #{ex.message}"
         end
       end
 
       extracted
+    rescue ex : Exception
+      @log.error "Failed to inspect #{video.name}: #{ex.message}"
+      [] of Path
+    end
+
+    private def build_output_name(video : VideoFile, lang2 : String, track_id : Int32, extension : String, duplicate_language : Bool) : String
+      if duplicate_language
+        "#{video.stem}.#{lang2}.track#{track_id}#{extension}"
+      else
+        "#{video.stem}.#{lang2}#{extension}"
+      end
     end
   end
 end

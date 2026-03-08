@@ -102,6 +102,10 @@ module EasySubtitle
       config = Config.from_yaml(content)
       config.validate!
       config
+    rescue ex : File::Error
+      raise ConfigError.new("Failed to read config #{path}: #{ex.message}")
+    rescue ex : YAML::ParseException
+      raise ConfigError.new("Invalid YAML in #{path}: #{ex.message}")
     end
 
     def self.load(path : Path) : Config

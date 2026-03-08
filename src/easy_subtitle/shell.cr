@@ -5,22 +5,27 @@ module EasySubtitle
     def self.run(cmd : String, args : Array(String) = [] of String, raise_on_error : Bool = true, timeout : Time::Span? = nil) : ShellResult
       stdout = IO::Memory.new
       stderr = IO::Memory.new
+      status : Process::Status
 
-      if timeout
-        process = Process.new(cmd, args, output: stdout, error: stderr)
+      begin
+        if timeout
+          process = Process.new(cmd, args, output: stdout, error: stderr)
 
-        channel = Channel(Process::Status).new(1)
-        spawn { channel.send(process.wait) }
+          channel = Channel(Process::Status).new(1)
+          spawn { channel.send(process.wait) }
 
-        select
-        when status = channel.receive
-          # handled below
-        when timeout(timeout)
-          process.terminate
-          raise ExternalToolError.new(cmd, -1, "Process timed out after #{timeout}")
+          status = select
+          when process_status = channel.receive
+            process_status
+          when timeout(timeout)
+            process.terminate
+            raise ExternalToolError.new(cmd, -1, "Process timed out after #{timeout}")
+          end
+        else
+          status = Process.run(cmd, args, output: stdout, error: stderr)
         end
-      else
-        status = Process.run(cmd, args, output: stdout, error: stderr)
+      rescue ex : File::NotFoundError | IO::Error
+        raise ExternalToolError.new(cmd, -1, ex.message || "Failed to start process")
       end
 
       result = ShellResult.new(
@@ -39,6 +44,8 @@ module EasySubtitle
     def self.which(cmd : String) : String?
       result = run("which", [cmd], raise_on_error: false)
       result.exit_code == 0 ? result.stdout.strip : nil
+    rescue ex : ExternalToolError
+      nil
     end
   end
 end

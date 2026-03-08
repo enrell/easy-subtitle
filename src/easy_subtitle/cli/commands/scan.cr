@@ -42,16 +42,20 @@ module EasySubtitle
 
       private def build_coverage(video : VideoFile, languages : Array(String)) : CoverageEntry
         entry = CoverageEntry.new(video)
-        dir = video.directory
+        begin
+          dir = video.directory
 
-        languages.each do |lang|
-          subs = [] of Path
-          Dir.each_child(dir.to_s) do |name|
-            if name.starts_with?(video.stem) && name.includes?(".#{lang}.") && name.ends_with?(".srt")
-              subs << dir / name
+          languages.each do |lang|
+            subs = [] of Path
+            Dir.each_child(dir.to_s) do |name|
+              if name.starts_with?(video.stem) && name.includes?(".#{lang}.") && name.ends_with?(".srt")
+                subs << dir / name
+              end
             end
+            entry.subtitles[lang] = subs
           end
-          entry.subtitles[lang] = subs
+        rescue ex : File::Error
+          @log.error "Failed to scan #{video.name}: #{ex.message}"
         end
 
         entry

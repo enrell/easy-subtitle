@@ -35,7 +35,7 @@ module EasySubtitle
         File.rename(temp_path.to_s, video.path.to_s)
         @log.success "Remuxed #{video.name}: kept #{keep_audio.size} audio, #{keep_subs.size} subtitle tracks"
         true
-      rescue ex : ExternalToolError
+      rescue ex : Exception
         File.delete(temp_path.to_s) if File.exists?(temp_path.to_s)
         @log.error "Remux failed: #{ex.message}"
         false
@@ -68,12 +68,16 @@ module EasySubtitle
     private def build_remux_args(input : Path, output : Path, keep_audio : Array(AudioTrack), keep_subs : Array(SubtitleTrack)) : Array(String)
       args = ["-o", output.to_s]
 
-      unless keep_audio.empty?
+      if keep_audio.empty?
+        args << "--no-audio"
+      else
         audio_ids = keep_audio.map(&.id.to_s).join(",")
         args += ["--audio-tracks", audio_ids]
       end
 
-      unless keep_subs.empty?
+      if keep_subs.empty?
+        args << "--no-subtitles"
+      else
         sub_ids = keep_subs.map(&.id.to_s).join(",")
         args += ["--subtitle-tracks", sub_ids]
       end

@@ -11,6 +11,10 @@ module EasySubtitle
       results = [] of VideoFile
       root = Path.new(path)
 
+      unless File.exists?(path)
+        raise Error.new("Path not found: #{path}")
+      end
+
       if File.file?(path)
         if video_file?(path)
           results << VideoFile.from_path(path)
@@ -61,8 +65,8 @@ module EasySubtitle
           yield full_path
         end
       end
-    rescue ex : File::AccessDeniedError
-      # Skip directories we can't read
+    rescue ex : File::AccessDeniedError | File::NotFoundError
+      # Skip directories that disappeared or can't be read.
     end
   end
 end

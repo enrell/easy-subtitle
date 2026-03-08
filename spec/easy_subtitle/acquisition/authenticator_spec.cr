@@ -31,4 +31,19 @@ describe EasySubtitle::Authenticator do
       auth.login!
     end
   end
+
+  it "raises when the login response is missing a token" do
+    config = EasySubtitle::Config.default
+    config.api_key = "test_key"
+    config.username = "testuser"
+    config.password = "testpass"
+
+    WebMock.stub(:post, "https://api.opensubtitles.com/api/v1/login")
+      .to_return(body: %({"ok": true}))
+
+    auth = EasySubtitle::Authenticator.new(config)
+    expect_raises(EasySubtitle::ApiError, /missing token/) do
+      auth.login!
+    end
+  end
 end

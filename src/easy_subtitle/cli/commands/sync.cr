@@ -33,12 +33,16 @@ module EasySubtitle
 
         videos.each do |video|
           languages.each do |lang|
-            candidates = find_candidates(video, lang)
-            next if candidates.empty?
-            total += 1
+            begin
+              candidates = find_candidates(video, lang)
+              next if candidates.empty?
+              total += 1
 
-            result = syncer.sync(video, candidates, lang)
-            accepted += 1 if result && result.accepted?
+              result = syncer.sync(video, candidates, lang)
+              accepted += 1 if result && result.accepted?
+            rescue ex : Exception
+              @log.error "Failed to sync #{video.name} [#{lang}]: #{ex.message}"
+            end
           end
         end
 
@@ -57,6 +61,9 @@ module EasySubtitle
         end
 
         candidates
+      rescue ex : File::Error
+        @log.error "Failed to read #{dir}: #{ex.message}"
+        [] of Path
       end
     end
   end
