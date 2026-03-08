@@ -18,11 +18,21 @@ module EasySubtitle
                  FirstMatch.new(@runner, @config, @log).execute(candidates, video)
                end
 
+      final_path = SubtitleFiles.final_path(video, language)
+
       if result && result.output_path
         saved = finalize_result(result, video, language)
         if saved
           delete_candidate_files(candidates)
           SubtitleCache.clear(video, language)
+          return result if File.exists?(final_path.to_s)
+
+          @log.error "Final subtitle disappeared after save: #{final_path}"
+          return SyncResult.new(
+            candidate_path: result.candidate_path,
+            status: SyncStatus::Failed,
+            alass_output: "Final subtitle missing after save: #{final_path}",
+          )
         elsif result.failed?
           cache_candidates(candidates, video, language, SyncStatus::Failed)
         end
@@ -40,13 +50,18 @@ module EasySubtitle
       output = result.output_path
       return false unless output
 
-      final_name = "#{video.stem}.#{language}.srt"
-      final_path = video.directory / final_name
+      final_name = SubtitleFiles.final_name(video, language)
+      final_path = SubtitleFiles.final_path(video, language)
 
       if result.accepted? || result.status.drift?
         begin
           File.delete(final_path.to_s) if File.exists?(final_path.to_s)
           File.rename(output.to_s, final_path.to_s)
+          unless File.exists?(final_path.to_s)
+            @log.error "Saved rename completed but final subtitle is missing: #{final_path}"
+            cleanup_temp_files(video.directory)
+            return false
+          end
           if result.accepted?
             @log.success "Saved: #{final_name} (timing shift: #{result.offset.round(3)}s, status: #{result.status})"
           else
