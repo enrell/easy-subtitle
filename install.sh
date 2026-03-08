@@ -2,8 +2,14 @@
 set -euo pipefail
 
 REPO="akitaonrails/easy-subtitle"
-INSTALL_DIR="/usr/local/bin"
 BINARY="easy-subtitle"
+
+# Prefer ~/.local/bin if it's in PATH, otherwise /usr/local/bin
+if echo "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then
+  INSTALL_DIR="$HOME/.local/bin"
+else
+  INSTALL_DIR="/usr/local/bin"
+fi
 
 # Colors
 RED='\033[0;31m'

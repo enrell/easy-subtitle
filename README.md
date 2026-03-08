@@ -18,7 +18,7 @@ Subservient is a capable ~10,000-line Python tool with an interactive menu UI, f
 ### Quick install (Linux x86_64)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/akitaonrails/easy-subtitle/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/akitaonrails/easy-subtitle/master/install.sh | bash
 ```
 
 ### From GitHub Releases
