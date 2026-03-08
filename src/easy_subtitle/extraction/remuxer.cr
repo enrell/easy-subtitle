@@ -27,7 +27,9 @@ module EasySubtitle
       args = build_remux_args(video.path, temp_path, keep_audio, keep_subs)
 
       begin
-        Shell.run("mkvmerge", args)
+        Spinner.run("Remuxing #{video.name}") do
+          Shell.run("mkvmerge", args)
+        end
 
         # Replace original with remuxed
         File.rename(temp_path.to_s, video.path.to_s)

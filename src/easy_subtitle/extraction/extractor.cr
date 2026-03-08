@@ -9,7 +9,9 @@ module EasySubtitle
         return [] of Path
       end
 
-      info = MkvInfo.identify(video.path)
+      info = Spinner.run("Identifying tracks in #{video.name}") do
+        MkvInfo.identify(video.path)
+      end
       subtitle_tracks = info[:subtitle_tracks]
 
       if subtitle_tracks.empty?
@@ -46,7 +48,9 @@ module EasySubtitle
         end
 
         begin
-          Shell.run("mkvextract", ["tracks", video.path.to_s, "#{track.id}:#{output_path}"])
+          Spinner.run("Extracting track #{track.id} (#{track.language})") do
+            Shell.run("mkvextract", ["tracks", video.path.to_s, "#{track.id}:#{output_path}"])
+          end
           @log.success "Extracted: #{output_name}"
           extracted << output_path
         rescue ex : ExternalToolError
