@@ -3,9 +3,10 @@ require "json"
 module EasySubtitle
   module MkvInfo
     def self.parse(json_str : String) : {subtitle_tracks: Array(SubtitleTrack), audio_tracks: Array(AudioTrack)}
+      sanitized = sanitize_large_ints(json_str)
       subtitle_tracks = [] of SubtitleTrack
       audio_tracks = [] of AudioTrack
-      parser = JSON::PullParser.new(json_str)
+      parser = JSON::PullParser.new(sanitized)
 
       parser.read_object do |key|
         if key == "tracks"
@@ -146,6 +147,20 @@ module EasySubtitle
         false
       else
         value
+      end
+    end
+
+    # Crystal's JSON parser crashes on integers exceeding Int64::MAX (such as
+    # mkvmerge track UIDs which are unsigned 64-bit). Quote them as strings
+    # before parsing so the pull parser can skip them safely.
+    private def self.sanitize_large_ints(json_str : String) : String
+      json_str.gsub(/:\s*(\d{19,})/) do |match|
+        num_str = $1
+        if (val = num_str.to_u64?) && val > Int64::MAX.to_u64
+          ": \"#{num_str}\""
+        else
+          match
+        end
       end
     end
   end
