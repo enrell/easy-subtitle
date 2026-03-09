@@ -91,7 +91,7 @@ These external tools must be on your PATH:
 | [mkvtoolnix](https://mkvtoolnix.download/) | MKV track extraction/remuxing | `pacman -S mkvtoolnix-cli` / `brew install mkvtoolnix` / `apt install mkvtoolnix` |
 | [alass](https://github.com/kaegi/alass) | Default subtitle synchronization backend | `cargo install alass-cli` or download from releases |
 | [ffsubsync](https://github.com/smacke/ffsubsync) | Optional subtitle synchronization backend | `pipx install ffsubsync` or `pip install ffsubsync` |
-| [whisper.cpp](https://github.com/ggml-org/whisper.cpp) | AI-powered sync backend (uses ASR + alass) | `brew install whisper-cpp` or build from source |
+| [whisper.cpp](https://github.com/ggml-org/whisper.cpp) | AI-powered sync backend (uses ASR + alass) | `yay -S whisper.cpp` / `brew install whisper-cpp` |
 | [ffmpeg](https://ffmpeg.org/) | Audio extraction (required by whisper backend) | `pacman -S ffmpeg` / `brew install ffmpeg` / `apt install ffmpeg` |
 
 An [OpenSubtitles](https://www.opensubtitles.com/) account and API key are required for the `download` command.

@@ -9,8 +9,6 @@ audio_track_languages:
   - en
   - nl
   - ja
-accept_offset_threshold: 0.101
-reject_offset_threshold: 2.5
 series_mode: false
 smart_sync: true
 use_movie_hash: true

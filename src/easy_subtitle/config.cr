@@ -22,12 +22,6 @@ module EasySubtitle
     @[YAML::Field(key: "audio_track_languages")]
     property audio_track_languages : Array(String) = ["en", "ja"]
 
-    @[YAML::Field(key: "accept_offset_threshold")]
-    property accept_offset_threshold : Float64 = 0.101
-
-    @[YAML::Field(key: "reject_offset_threshold")]
-    property reject_offset_threshold : Float64 = 2.5
-
     @[YAML::Field(key: "series_mode")]
     property series_mode : Bool = false
 
@@ -119,15 +113,6 @@ module EasySubtitle
     end
 
     def validate! : Nil
-      if accept_offset_threshold < 0
-        raise ConfigError.new("accept_offset_threshold must be >= 0")
-      end
-      if reject_offset_threshold < 0
-        raise ConfigError.new("reject_offset_threshold must be >= 0")
-      end
-      if accept_offset_threshold >= reject_offset_threshold
-        raise ConfigError.new("accept_offset_threshold must be < reject_offset_threshold")
-      end
       if max_search_results < 1
         raise ConfigError.new("max_search_results must be >= 1")
       end

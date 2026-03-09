@@ -152,7 +152,7 @@ describe EasySubtitle::SmartSync do
 
       result.should_not be_nil
       result.not_nil!.status.failed?.should be_true
-      result.not_nil!.alass_output.should contain "boom"
+      result.not_nil!.sync_output.should contain "boom"
     end
 
     it "prefers the successful candidate with more downloads" do
@@ -224,7 +224,7 @@ describe EasySubtitle::SmartSync do
       result = sync.execute([candidate], video)
       result.should_not be_nil
       result.not_nil!.drift?.should be_true
-      result.not_nil!.alass_output.should contain "warn:"
+      result.not_nil!.sync_output.should contain "warn:"
     ensure
       [candidate, Path.new("/tmp/test.en.d100.f1_synced.srt")].each do |path|
         File.delete(path.to_s) if File.exists?(path.to_s)

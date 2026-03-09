@@ -38,7 +38,7 @@ module EasySubtitle
           return SyncResult.new(
             candidate_path: result.candidate_path,
             status: SyncStatus::Failed,
-            alass_output: "Final subtitle missing after save: #{final_path}",
+            sync_output: "Final subtitle missing after save: #{final_path}",
           )
         elsif result.failed?
           cache_candidates(candidates, video, language, SyncStatus::Failed)

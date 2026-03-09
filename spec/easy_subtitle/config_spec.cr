@@ -6,8 +6,6 @@ describe EasySubtitle::Config do
       config = EasySubtitle::Config.default
       config.api_url.should eq "https://api.opensubtitles.com/api/v1"
       config.languages.should eq ["en"]
-      config.accept_offset_threshold.should eq 0.101
-      config.reject_offset_threshold.should eq 2.5
       config.smart_sync.should be_true
       config.sync_backend.should eq "alass"
       config.use_movie_hash.should be_true
@@ -33,7 +31,6 @@ describe EasySubtitle::Config do
       config = EasySubtitle::Config.load(fixture("config_minimal.yml"))
       config.api_key.should eq "my_key"
       config.languages.should eq ["en"]
-      config.accept_offset_threshold.should eq 0.101
       config.smart_sync.should be_true
     end
 
@@ -53,23 +50,6 @@ describe EasySubtitle::Config do
     it "passes for valid config" do
       config = EasySubtitle::Config.default
       config.validate!
-    end
-
-    it "rejects negative accept_offset_threshold" do
-      config = EasySubtitle::Config.default
-      config.accept_offset_threshold = -1.0
-      expect_raises(EasySubtitle::ConfigError, /accept_offset_threshold/) do
-        config.validate!
-      end
-    end
-
-    it "rejects accept >= reject threshold" do
-      config = EasySubtitle::Config.default
-      config.accept_offset_threshold = 3.0
-      config.reject_offset_threshold = 2.5
-      expect_raises(EasySubtitle::ConfigError, /accept_offset_threshold/) do
-        config.validate!
-      end
     end
 
     it "rejects empty languages" do
@@ -96,7 +76,7 @@ describe EasySubtitle::Config do
       loaded = EasySubtitle::Config.from_yaml(yaml)
       loaded.api_url.should eq original.api_url
       loaded.languages.should eq original.languages
-      loaded.accept_offset_threshold.should eq original.accept_offset_threshold
+      loaded.smart_sync.should eq original.smart_sync
     end
   end
 end

@@ -32,7 +32,7 @@ module EasySubtitle
     end
 
     def install_help : String
-      "brew install whisper-cpp  OR  build from https://github.com/ggml-org/whisper.cpp"
+      "yay -S whisper.cpp  OR  brew install whisper-cpp"
     end
 
     def available? : Bool

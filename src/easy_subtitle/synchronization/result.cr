@@ -10,14 +10,14 @@ module EasySubtitle
     property output_path : Path?
     property offset : Float64
     property status : SyncStatus
-    property alass_output : String
+    property sync_output : String
 
     def initialize(
       @candidate_path,
       @output_path = nil,
       @offset = 0.0,
       @status = SyncStatus::Failed,
-      @alass_output = "",
+      @sync_output = "",
     )
     end
 
