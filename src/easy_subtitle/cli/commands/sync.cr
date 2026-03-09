@@ -93,7 +93,6 @@ module EasySubtitle
         @log.error "Failed to read #{dir}: #{ex.message}"
         [] of Path
       end
-
     end
   end
 end
